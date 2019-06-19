@@ -1,0 +1,6 @@
+framework module Pods_UmengSwift {
+  umbrella header "Pods-UmengSwift-umbrella.h"
+
+  export *
+  module * { export * }
+}
