@@ -51,11 +51,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     /// 拿到 Device Token
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        UMessage.registerDeviceToken(deviceToken)
-
-        let device = NSData(data: deviceToken)
-        let deviceId = device.description.replacingOccurrences(of:"<", with:"").replacingOccurrences(of:">", with:"").replacingOccurrences(of:" ", with:"")
-        print("deviceToken：\(deviceId)")
+        if #available(iOS 13.0, *) {
+            var deviceTokenString = String()
+            let bytes = [UInt8](deviceToken)
+            for item in bytes {
+                deviceTokenString += String(format:"%02x", item&0x000000FF)
+            }
+            printLog("deviceToken：\(deviceTokenString)")
+        }else{
+            UMessage.registerDeviceToken(deviceToken)
+            let device = NSData(data: deviceToken)
+            let deviceId = device.description.replacingOccurrences(of:"<", with:"").replacingOccurrences(of:">", with:"").replacingOccurrences(of:" ", with:"")
+            print("deviceToken：\(deviceId)")
+        }
     }
     
     /// 注册推送失败
