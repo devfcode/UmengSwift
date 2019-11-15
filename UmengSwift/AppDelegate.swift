@@ -13,7 +13,7 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    let umengkey = "5d09b4f40cafb284a50010fc"
+    let umengkey = "5dcd23054ca3579e1a000ba3"
     
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -31,10 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         /// 友盟統計
         MobClick.setScenarioType(eScenarioType.E_UM_NORMAL)
         
-        /// iOS 10 以上必須支援
-        if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().delegate = self
-        }
+        UNUserNotificationCenter.current().delegate = self
         
         /// 友盟推送配置
         let entity = UMessageRegisterEntity.init()
@@ -57,7 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             for item in bytes {
                 deviceTokenString += String(format:"%02x", item&0x000000FF)
             }
-            printLog("deviceToken：\(deviceTokenString)")
+            print("deviceToken：\(deviceTokenString)")
         }else{
             UMessage.registerDeviceToken(deviceToken)
             let device = NSData(data: deviceToken)
@@ -75,17 +72,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
         UMessage.didReceiveRemoteNotification(userInfo)
     }
-    
-    /// iOS10 以前接收的方法
-    func application(_ application: UIApplication,
-                     handleActionWithIdentifier identifier: String?,
-                     for notification: UILocalNotification,
-                     withResponseInfo responseInfo: [AnyHashable: Any],
-                     completionHandler: @escaping () -> Void) {
-        /// 这个方法用来做action点击的统计
-        UMessage.sendClickReport(forRemoteNotification: responseInfo)
-    }
-
     
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -114,27 +100,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
-    
-    //iOS10以下使用这两个方法接收通知，
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        
-        //关闭友盟自带的弹出框
-        UMessage.setAutoAlert(false)
-    
-        if  UIDevice.current.systemVersion < "10" {
-            UMessage.didReceiveRemoteNotification(userInfo)
-//            self.umUserInfo = userInfo;
-            //定制自定的的弹出框
-            if UIApplication.shared.applicationState == UIApplication.State.active {
-                let alertViewVc = UIAlertController.init(title: "通知标题", message: "Test On ApplicationStateActive", preferredStyle: UIAlertController.Style.alert)
-                alertViewVc.addAction(UIAlertAction.init(title: "确定", style: UIAlertAction.Style.default, handler: { (alertView) in
-                    // sure click
-                }))
-                self.window?.rootViewController?.present(alertViewVc, animated: true, completion: nil)
-            }
-            completionHandler(UIBackgroundFetchResult.newData)
-        }
-    }
     
     //iOS10新增：处理前台收到通知的代理方法
     @available(iOS 10.0, *)
